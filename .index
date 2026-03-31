@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PhotoChallenge</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #141414;
+      --surface2: #1e1e1e;
+      --border: rgba(255,255,255,0.08);
+      --text: #f0ece4;
+      --muted: #7a7570;
+      --accent: #e8c97a;
+      --accent2: #c9a84c;
+      --danger: #e07070;
+      --radius: 16px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow: hidden;
+    }
+
+    /* ── ÉCRAN D'ACCUEIL ── */
+    #screen-welcome {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #screen-welcome::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,201,122,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(180,120,60,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .welcome-inner {
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .logo-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      box-shadow: 0 8px 32px rgba(232,201,122,0.25);
+    }
+
+    .welcome-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 6vw, 3rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+    }
+
+    .welcome-sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 2.5rem;
+      line-height: 1.6;
+    }
+
+    .welcome-sub em {
+      color: var(--accent);
+      font-style: normal;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 1rem 1.2rem;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(232,201,122,0.12);
+    }
+
+    .input-group input::placeholder { color: var(--muted); }
+
+    .btn-primary {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #1a1200;
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    /* ── ÉCRAN PRINCIPAL ── */
+    #screen-main {
+      display: none;
+      height: 100vh;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .app-header {
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      background: rgba(10,10,10,0.9);
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 10;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .header-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #1a1200;
+      flex-shrink: 0;
+    }
+
+    .header-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .progress-pill {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .progress-pill span { color: var(--accent); font-weight: 500; }
+
+    .card-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .challenge-card {
+      position: absolute;
+      width: min(92vw, 420px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+      transition: transform 0.35s cubic-bezier(.25,.8,.25,1), opacity 0.35s;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .challenge-card.is-next {
+      transform: scale(0.94) translateY(12px);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .challenge-card.slide-left {
+      animation: slideLeft 0.45s cubic-bezier(.55,0,.45,1) forwards;
+    }
+
+    .challenge-card.slide-right {
+      animation: slideRight 0.45s cubic-bezier(.55,0,.45,1) forwards;
+    }
+
+    .ref-image-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: var(--surface2);
+      overflow: hidden;
+    }
+
+    .ref-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .ref-image-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .ref-image-placeholder .ph-icon { font-size: 2.5rem; opacity: 0.4; }
+
+    .card-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0,0,0,0.65);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 0.3rem 0.65rem;
+      font-size: 0.72rem;
+      color: var(--accent);
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .card-body {
+      padding: 1.2rem 1.25rem 1.4rem;
+    }
+
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-desc {
+      color: var(--muted);
+      font-size: 0.82rem;
+      line-height: 1.55;
+      margin-bottom: 1.1rem;
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative;
+      overflow: hidden;
+      display: block;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--accent);
+      background: rgba(232,201,122,0.04);
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-zone.has-file {
+      border-color: rgba(232,201,122,0.5);
+      background: rgba(232,201,122,0.06);
+    }
+
+    .upload-label {
+      font-size: 0.82rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .upload-label strong { color: var(--accent); }
+
+    .preview-thumb {
+      width: 100%;
+      max-height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      display: none;
+      pointer-events: none;
+    }
+
+    .preview-thumb.visible { display: block; }
+
+    .card-actions {
+      display: flex;
+      gap: 0.65rem;
+      margin-top: 1rem;
+    }
+
+    .btn-skip {
+      flex: 0 0 auto;
+      padding: 0.75rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-skip:hover { background: #2a2a2a; color: var(--text); }
+
+    .btn-send {
+      flex: 1;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #1a1200;
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+
+    .btn-send:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-send:not(:disabled):hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .swipe-hint {
+      position: absolute;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      font-size: 0.75rem;
+      opacity: 0;
+      animation: fadeIn 1s 2s ease forwards;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .swipe-hint-arrow { animation: bounce 1.5s infinite; }
+
+    /* ── ÉCRAN FIN ── */
+    #screen-done {
+      height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .done-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      animation: pop 0.5s 0.2s cubic-bezier(.17,.89,.32,1.28) both;
+    }
+
+    .done-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .done-sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      max-width: 320px;
+    }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 1.25rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      z-index: 999;
+      transition: transform 0.35s cubic-bezier(.25,.8,.25,1);
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+    #toast.success { border-color: rgba(232,201,122,0.4); color: var(--accent); }
+    #toast.error   { border-color: rgba(224,112,112,0.4); color: var(--danger); }
+
+    /* Loader */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,10,10,0.75);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn { to { opacity: 1; } }
+    @keyframes pop {
+      from { opacity: 0; transform: scale(0.5); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes bounce {
+      0%, 100% { transform: translateX(0); }
+      50%       { transform: translateX(5px); }
+    }
+    @keyframes slideLeft {
+      to { transform: translateX(-130%) rotate(-10deg); opacity: 0; }
+    }
+    @keyframes slideRight {
+      to { transform: translateX(130%) rotate(10deg); opacity: 0; }
+    }
+
+    @media (max-height: 680px) {
+      .ref-image-wrap { aspect-ratio: 16/9; }
+      .card-body { padding: 0.9rem 1rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ÉCRAN ACCUEIL -->
+<div id="screen-welcome">
+  <div class="welcome-inner">
+    <div class="logo-icon">📷</div>
+    <h1 class="welcome-title">Photo Challenge</h1>
+    <p class="welcome-sub">
+      Imite chaque photo de référence et envoie ta version.<br>
+      <em>Que le meilleur photographe gagne !</em>
+    </p>
+    <div class="input-group">
+      <input type="text" id="input-name" placeholder="Ton prénom..." autocomplete="off" maxlength="30"/>
+    </div>
+    <button class="btn-primary" onclick="startChallenge()">Commencer le défi →</button>
+  </div>
+</div>
+
+<!-- ÉCRAN PRINCIPAL -->
+<div id="screen-main">
+  <header class="app-header">
+    <div class="header-left">
+      <div class="header-avatar" id="avatar-initials">?</div>
+      <span class="header-name" id="header-name">—</span>
+    </div>
+    <div class="progress-pill">
+      Photo <span id="prog-current">1</span> / <span id="prog-total">5</span>
+    </div>
+  </header>
+  <div class="card-area" id="card-area">
+    <div class="swipe-hint">
+      <span class="swipe-hint-arrow">→</span> Swipe ou clique sur « Passer »
+    </div>
+  </div>
+</div>
+
+<!-- ÉCRAN FIN -->
+<div id="screen-done" style="display:none; flex-direction:column; align-items:center; justify-content:center; height:100vh; text-align:center; padding:2rem;">
+  <div class="done-icon">🏆</div>
+  <h2 class="done-title">Bravo <span id="done-name"></span> !</h2>
+  <p class="done-sub">Toutes tes photos ont bien été envoyées.<br>Les résultats seront annoncés bientôt !</p>
+</div>
+
+<div id="toast"></div>
+<div id="loader"><div class="spinner"></div></div>
+
+<script>
+// ══════════════════════════════════════════
+//  ⚙️  CONFIGURATION — À MODIFIER
+// ══════════════════════════════════════════
+
+// Colle ici l'URL de ton Google Apps Script (étape 2)
+const APPS_SCRIPT_URL = "REMPLACE_PAR_TON_URL_APPS_SCRIPT";
+
+// Liste tes images de référence
+// → Crée un dossier "images/" dans GitHub et mets tes photos dedans
+const CHALLENGES = [
+  {
+    id: 1,
+    title: "Le portrait mystérieux",
+    description: "Reproduis cette mise en scène : lumière latérale, regard de côté.",
+    image: "images/challenge-1.jpg"
+  },
+  {
+    id: 2,
+    title: "La nature morte",
+    description: "Recréé cette composition avec des objets du quotidien.",
+    image: "images/challenge-2.jpg"
+  },
+  {
+    id: 3,
+    title: "L'architecture",
+    description: "Trouve un angle similaire dans ton environnement.",
+    image: "images/challenge-3.jpg"
+  },
+  {
+    id: 4,
+    title: "La silhouette",
+    description: "Joue avec la lumière pour créer cette silhouette.",
+    image: "images/challenge-4.jpg"
+  },
+  {
+    id: 5,
+    title: "Le détail caché",
+    description: "Macro ou zoom : trouve ce type de détail autour de toi.",
+    image: "images/challenge-5.jpg"
+  }
+];
+
+// ══════════════════════════════════════════
+//  ÉTAT
+// ══════════════════════════════════════════
+let userName   = "";
+let currentIdx = 0;
+let submissions = {};
+let touchStartX = 0;
+
+// ══════════════════════════════════════════
+//  DÉMARRAGE
+// ══════════════════════════════════════════
+function startChallenge() {
+  const val = document.getElementById("input-name").value.trim();
+  if (!val) { showToast("Saisis ton prénom pour commencer 😊", "error"); return; }
+
+  userName = val;
+  document.getElementById("header-name").textContent = userName;
+  document.getElementById("avatar-initials").textContent = userName[0].toUpperCase();
+  document.getElementById("done-name").textContent = userName;
+  document.getElementById("prog-total").textContent = CHALLENGES.length;
+
+  document.getElementById("screen-welcome").style.display = "none";
+  const sm = document.getElementById("screen-main");
+  sm.style.display = "flex";
+  renderCard(currentIdx);
+}
+
+document.getElementById("input-name").addEventListener("keydown", e => {
+  if (e.key === "Enter") startChallenge();
+});
+
+// ══════════════════════════════════════════
+//  CARTES
+// ══════════════════════════════════════════
+function renderCard(idx) {
+  document.getElementById("prog-current").textContent = idx + 1;
+  const area = document.getElementById("card-area");
+
+  // Enlever l'ancienne carte active
+  const old = area.querySelector(".challenge-card:not(.is-next)");
+  if (old && !old.classList.contains("slide-left") && !old.classList.contains("slide-right")) {
+    old.remove();
+  }
+
+  // Promouvoir la carte suivante
+  const nextCard = area.querySelector(".challenge-card.is-next");
+  if (nextCard) { nextCard.classList.remove("is-next"); void nextCard.offsetWidth; }
+
+  // Carte active
+  const ch   = CHALLENGES[idx];
+  const card = buildCard(ch, idx);
+  area.insertBefore(card, area.querySelector(".swipe-hint"));
+
+  // Carte suivante (aperçu)
+  if (idx + 1 < CHALLENGES.length) {
+    const peek = buildCard(CHALLENGES[idx + 1], idx + 1);
+    peek.classList.add("is-next");
+    area.insertBefore(peek, card);
+  }
+
+  // Swipe tactile
+  card.addEventListener("touchstart", e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  card.addEventListener("touchend",   e => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 60) skipCard(dx < 0 ? "left" : "right");
+  }, { passive: true });
+}
+
+function buildCard(ch, idx) {
+  const card = document.createElement("div");
+  card.className = "challenge-card";
+  card.dataset.idx = idx;
+
+  card.innerHTML = `
+    <div class="ref-image-wrap">
+      <div class="ref-image-placeholder">
+        <span class="ph-icon">🖼️</span>
+        <span>Image de référence</span>
+      </div>
+      <img src="${ch.image}" alt="${ch.title}"
+           onload="this.previousElementSibling.style.display='none'"
+           onerror="this.style.display='none'"
+           style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>
+      <span class="card-badge">#${String(idx + 1).padStart(2,"0")}</span>
+    </div>
+    <div class="card-body">
+      <h2 class="card-title">${ch.title}</h2>
+      <p class="card-desc">${ch.description}</p>
+      <label class="upload-zone" id="zone-${ch.id}">
+        <input type="file" accept="image/*" capture="environment"
+               onchange="handleFile(event, ${ch.id})"/>
+        <img class="preview-thumb" id="thumb-${ch.id}" alt=""/>
+        <div class="upload-label" id="lbl-${ch.id}">
+          <strong>📁 Choisir ma photo</strong><br>ou prendre avec l'appareil
+        </div>
+      </label>
+      <div class="card-actions">
+        <button class="btn-skip" onclick="skipCard('left')">Passer →</button>
+        <button class="btn-send" id="btn-send-${ch.id}" disabled
+                onclick="submitCard(${ch.id})">Envoyer ma photo ✓</button>
+      </div>
+    </div>`;
+  return card;
+}
+
+// ══════════════════════════════════════════
+//  FICHIER
+// ══════════════════════════════════════════
+function handleFile(event, cid) {
+  const file = event.target.files[0];
+  if (!file) return;
+  submissions[cid] = file;
+
+  const thumb = document.getElementById(`thumb-${cid}`);
+  const lbl   = document.getElementById(`lbl-${cid}`);
+  const zone  = document.getElementById(`zone-${cid}`);
+  const btn   = document.getElementById(`btn-send-${cid}`);
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    thumb.src = e.target.result;
+    thumb.classList.add("visible");
+    lbl.style.display = "none";
+    zone.classList.add("has-file");
+    btn.disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ══════════════════════════════════════════
+//  ENVOI GOOGLE APPS SCRIPT
+// ══════════════════════════════════════════
+async function submitCard(cid) {
+  const file = submissions[cid];
+  if (!file) return;
+
+  if (APPS_SCRIPT_URL === "REMPLACE_PAR_TON_URL_APPS_SCRIPT") {
+    showLoader(true);
+    await sleep(1200);
+    showLoader(false);
+    showToast("✅ Photo envoyée ! (mode démo)", "success");
+    nextChallenge();
+    return;
+  }
+
+  showLoader(true);
+  try {
+    const base64 = await fileToBase64(file);
+    const payload = {
+      participant : userName,
+      challengeId : cid,
+      fileName    : `${userName}_challenge${cid}_${Date.now()}.${file.name.split('.').pop()}`,
+      fileData    : base64,
+      mimeType    : file.type
+    };
+    const resp = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+    if (!resp.ok) throw new Error("Erreur serveur");
+    showToast("✅ Photo envoyée !", "success");
+    nextChallenge();
+  } catch (err) {
+    console.error(err);
+    showToast("❌ Erreur d'envoi. Réessaie.", "error");
+  } finally {
+    showLoader(false);
+  }
+}
+
+function fileToBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload  = () => res(r.result.split(",")[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+// ══════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════
+function skipCard(dir = "left") {
+  const area   = document.getElementById("card-area");
+  const active = area.querySelector(".challenge-card:not(.is-next)");
+  if (!active) return;
+
+  active.classList.add(dir === "left" ? "slide-left" : "slide-right");
+  active.addEventListener("animationend", () => active.remove(), { once: true });
+
+  currentIdx++;
+  if (currentIdx >= CHALLENGES.length) { showDone(); return; }
+  renderCard(currentIdx);
+}
+
+function nextChallenge() {
+  currentIdx++;
+  if (currentIdx >= CHALLENGES.length) setTimeout(showDone, 600);
+  else skipCard("left");
+}
+
+function showDone() {
+  document.getElementById("screen-main").style.display = "none";
+  document.getElementById("screen-done").style.display = "flex";
+}
+
+// ══════════════════════════════════════════
+//  UTILITAIRES
+// ══════════════════════════════════════════
+let toastTimer;
+function showToast(msg, type = "") {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className   = type ? `show ${type}` : "show";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ""; }, 3000);
+}
+
+function showLoader(on) {
+  document.getElementById("loader").style.display = on ? "flex" : "none";
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+</body>
+</html>
