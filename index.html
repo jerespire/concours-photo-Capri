@@ -550,41 +550,31 @@
 // ══════════════════════════════════════════
 
 // Colle ici l'URL de ton Google Apps Script (étape 2)
-const APPS_SCRIPT_URL = "https://script.google.com/d/12miqmA2xWf4DZO217sh7vNPizaqLPQynYn_lgkC_CIk26d5A4b75UC7u/edit?usp=sharing";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/12miqmA2xWf4DZO217sh7vNPizaqLPQynYn_lgkC_CIk26d5A4b75UC7u/exec";
 
 // Liste tes images de référence
 // → Crée un dossier "images/" dans GitHub et mets tes photos dedans
 const CHALLENGES = [
-  {
-    id: 1,
-    title: "Le portrait mystérieux",
-    description: "Reproduis cette mise en scène : lumière latérale, regard de côté.",
-    image: "images/challenge-1.jpg"
-  },
-  {
-    id: 2,
-    title: "La nature morte",
-    description: "Recréé cette composition avec des objets du quotidien.",
-    image: "images/challenge-2.jpg"
-  },
-  {
-    id: 3,
-    title: "L'architecture",
-    description: "Trouve un angle similaire dans ton environnement.",
-    image: "images/challenge-3.jpg"
-  },
-  {
-    id: 4,
-    title: "La silhouette",
-    description: "Joue avec la lumière pour créer cette silhouette.",
-    image: "images/challenge-4.jpg"
-  },
-  {
-    id: 5,
-    title: "Le détail caché",
-    description: "Macro ou zoom : trouve ce type de détail autour de toi.",
-    image: "images/challenge-5.jpg"
-  }
+  { id:  1, title: "Le portrait mystérieux",   description: "Reproduis cette mise en scène : lumière latérale, regard de côté.",          image: "images/challenge-1.jpg"  },
+  { id:  2, title: "La nature morte",           description: "Recrée cette composition avec des objets du quotidien.",                      image: "images/challenge-2.jpg"  },
+  { id:  3, title: "L'architecture",            description: "Trouve un angle similaire dans ton environnement.",                           image: "images/challenge-3.jpg"  },
+  { id:  4, title: "La silhouette",             description: "Joue avec la lumière pour créer cette silhouette.",                           image: "images/challenge-4.jpg"  },
+  { id:  5, title: "Le détail caché",           description: "Macro ou zoom : trouve ce type de détail autour de toi.",                     image: "images/challenge-5.jpg"  },
+  { id:  6, title: "Le reflet",                 description: "Capture un reflet dans une surface : eau, miroir, vitrine…",                  image: "images/challenge-6.jpg"  },
+  { id:  7, title: "La texture",                description: "Mets en valeur une texture brute : bois, béton, tissu, rouille…",             image: "images/challenge-7.jpg"  },
+  { id:  8, title: "La symétrie",               description: "Trouve une composition parfaitement symétrique autour de toi.",               image: "images/challenge-8.jpg"  },
+  { id:  9, title: "La couleur dominante",      description: "Une photo où une seule couleur écrase tout le reste.",                        image: "images/challenge-9.jpg"  },
+  { id: 10, title: "Le mouvement flou",         description: "Capte un mouvement avec un léger flou de bougé intentionnel.",                image: "images/challenge-10.jpg" },
+  { id: 11, title: "Le contre-jour",            description: "Place ton sujet devant la source de lumière pour créer un halo.",             image: "images/challenge-11.jpg" },
+  { id: 12, title: "La profondeur de champ",    description: "Sujet net, arrière-plan complètement flou (bokeh).",                          image: "images/challenge-12.jpg" },
+  { id: 13, title: "L'ombre et la lumière",     description: "Joue avec le contraste fort entre ombre et lumière directe.",                 image: "images/challenge-13.jpg" },
+  { id: 14, title: "Le minimalisme",            description: "Le moins d'éléments possible, le maximum d'impact.",                         image: "images/challenge-14.jpg" },
+  { id: 15, title: "La règle des tiers",        description: "Place ton sujet sur l'un des quatre points forts de l'image.",                image: "images/challenge-15.jpg" },
+  { id: 16, title: "Le cadre dans le cadre",    description: "Utilise un élément (porte, fenêtre, arche) pour encadrer ton sujet.",         image: "images/challenge-16.jpg" },
+  { id: 17, title: "La ligne directrice",       description: "Une ligne (route, rail, couloir) qui guide l'œil vers le fond.",              image: "images/challenge-17.jpg" },
+  { id: 18, title: "Le format carré",           description: "Compose une image pensée pour le format 1:1, sans recadrage.",               image: "images/challenge-18.jpg" },
+  { id: 19, title: "Le noir & blanc",           description: "Transforme cette scène en photo noir et blanc avec du contraste.",            image: "images/challenge-19.jpg" },
+  { id: 20, title: "La photo mystère",          description: "Surprise ! Reproduis cette image sans aucun indice supplémentaire.",          image: "images/challenge-20.jpg" }
 ];
 
 // ══════════════════════════════════════════
@@ -723,7 +713,7 @@ async function submitCard(cid) {
   const file = submissions[cid];
   if (!file) return;
 
-  if (APPS_SCRIPT_URL === "https://script.google.com/d/12miqmA2xWf4DZO217sh7vNPizaqLPQynYn_lgkC_CIk26d5A4b75UC7u/edit?usp=sharing") {
+  if (APPS_SCRIPT_URL === "REMPLACE_PAR_TON_URL_APPS_SCRIPT") {
     showLoader(true);
     await sleep(1200);
     showLoader(false);
