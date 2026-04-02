@@ -362,6 +362,22 @@
 
     .btn-skip:hover { background: #2a2a2a; color: var(--text); }
 
+    .btn-back {
+      flex: 0 0 auto;
+      padding: 0.75rem 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-back:hover { background: #2a2a2a; color: var(--text); }
+    .btn-back:disabled { opacity: 0.25; cursor: not-allowed; }
+
     .btn-send {
       flex: 1;
       padding: 0.75rem;
@@ -674,9 +690,10 @@ function buildCard(ch, idx) {
         </div>
       </label>
       <div class="card-actions">
+        <button class="btn-back" id="btn-back-${ch.id}" onclick="goBack()" ${idx === 0 ? 'disabled' : ''}>← Retour</button>
         <button class="btn-skip" onclick="skipCard('left')">Passer →</button>
         <button class="btn-send" id="btn-send-${ch.id}" disabled
-                onclick="submitCard(${ch.id})">Envoyer ma photo ✓</button>
+                onclick="submitCard(${ch.id})">Envoyer ✓</button>
       </div>
     </div>`;
   return card;
