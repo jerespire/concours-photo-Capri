@@ -194,38 +194,36 @@
 
     .card-area {
       flex: 1;
-      position: relative;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
+      padding: 1.5rem 1rem 2rem;
     }
 
     .challenge-card {
-      position: absolute;
+      position: relative;
       width: min(92vw, 420px);
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 24px;
       overflow: hidden;
       box-shadow: 0 32px 80px rgba(0,0,0,0.6);
-      transition: transform 0.35s cubic-bezier(.25,.8,.25,1), opacity 0.35s;
-      touch-action: none;
       user-select: none;
+      flex-shrink: 0;
     }
 
-    .challenge-card.is-next {
-      transform: scale(0.94) translateY(12px);
-      opacity: 0.5;
-      pointer-events: none;
-    }
+    .challenge-card.is-next { display: none; }
 
     .challenge-card.slide-left {
       animation: slideLeft 0.45s cubic-bezier(.55,0,.45,1) forwards;
+      position: absolute;
     }
 
     .challenge-card.slide-right {
       animation: slideRight 0.45s cubic-bezier(.55,0,.45,1) forwards;
+      position: absolute;
     }
 
     .ref-image-wrap {
@@ -395,23 +393,7 @@
     .btn-send:disabled { opacity: 0.35; cursor: not-allowed; }
     .btn-send:not(:disabled):hover { opacity: 0.9; transform: translateY(-1px); }
 
-    .swipe-hint {
-      position: absolute;
-      bottom: 1.2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--muted);
-      font-size: 0.75rem;
-      opacity: 0;
-      animation: fadeIn 1s 2s ease forwards;
-      white-space: nowrap;
-      pointer-events: none;
-    }
 
-    .swipe-hint-arrow { animation: bounce 1.5s infinite; }
 
     /* ── ÉCRAN FIN ── */
     #screen-done {
@@ -544,9 +526,7 @@
     </div>
   </header>
   <div class="card-area" id="card-area">
-    <div class="swipe-hint">
-      <span class="swipe-hint-arrow">→</span> Swipe ou clique sur « Passer »
-    </div>
+
   </div>
 </div>
 
@@ -566,7 +546,7 @@
 // ══════════════════════════════════════════
 
 // Colle ici l'URL de ton Google Apps Script (étape 2)
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/12miqmA2xWf4DZO217sh7vNPizaqLPQynYn_lgkC_CIk26d5A4b75UC7u/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyp9dNxj8F5f0l_Dq9vgWX12C5RyWaNvo_sYUNrDu0UegNM5s_YA-7HA7OBVioJv9RmmA/exec";
 
 // Liste tes images de référence
 // → Crée un dossier "images/" dans GitHub et mets tes photos dedans
@@ -644,7 +624,7 @@ function renderCard(idx) {
   // Carte active
   const ch   = CHALLENGES[idx];
   const card = buildCard(ch, idx);
-  area.insertBefore(card, area.querySelector(".swipe-hint"));
+  area.appendChild(card);
 
   // Carte suivante (aperçu)
   if (idx + 1 < CHALLENGES.length) {
