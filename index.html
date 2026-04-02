@@ -773,6 +773,14 @@ function fileToBase64(file) {
 // ══════════════════════════════════════════
 //  NAVIGATION
 // ══════════════════════════════════════════
+function goBack() {
+  if (currentIdx === 0) return;
+  const area = document.getElementById("card-area");
+  area.querySelectorAll(".challenge-card").forEach(c => c.remove());
+  currentIdx--;
+  renderCard(currentIdx);
+}
+
 function skipCard(dir = "left") {
   const area   = document.getElementById("card-area");
   const active = area.querySelector(".challenge-card:not(.is-next)");
