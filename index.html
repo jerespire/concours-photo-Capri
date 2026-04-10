@@ -523,42 +523,22 @@
     }
 
     /* ── CADENAS & MODAL ── */
-    .lock-btn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      width: 38px;
-      height: 38px;
-      background: rgba(198,73,54,0.9);
+    #secret-lock-btn {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      background: none;
       border: none;
-      border-radius: 50%;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       font-size: 18px;
-      box-shadow: 0 2px 12px rgba(198,73,54,0.4);
-      z-index: 5;
-      transition: transform 0.2s, background 0.2s;
+      opacity: 0.18;
+      z-index: 50;
+      transition: opacity 0.2s;
+      line-height: 1;
     }
-    .lock-btn:hover { transform: scale(1.1); background: rgba(174,53,33,0.95); }
-
-    .lock-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(245,240,235,0.92);
-      backdrop-filter: blur(6px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      z-index: 4;
-      border-radius: 24px;
-    }
-
-    .lock-overlay .lock-icon { font-size: 3rem; }
-    .lock-overlay p { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 0 1rem; }
+    #secret-lock-btn:hover { opacity: 0.55; }
 
     #password-modal {
       position: fixed;
@@ -685,6 +665,9 @@
 </div>
 
 
+<!-- CADENAS DISCRET (coin haut droit, quasi invisible) -->
+<button id="secret-lock-btn" onclick="openModal(21)" title="">🔒</button>
+
 <!-- MODAL MOT DE PASSE -->
 <div id="password-modal">
   <div class="modal-box">
@@ -778,9 +761,13 @@ function renderCard(idx) {
   // Nettoyer toutes les cartes non animées
   area.querySelectorAll(".challenge-card:not(.slide-left):not(.slide-right)").forEach(c => c.remove());
 
-  // Carte suivante en arrière-plan
-  if (idx + 1 < CHALLENGES.length) {
-    const peek = buildCard(CHALLENGES[idx + 1], idx + 1);
+  // Carte suivante en arrière-plan (ignore les locked non débloquées)
+  let nextVisibleIdx = idx + 1;
+  while (nextVisibleIdx < CHALLENGES.length && CHALLENGES[nextVisibleIdx].locked && !unlockedIds.includes(CHALLENGES[nextVisibleIdx].id)) {
+    nextVisibleIdx++;
+  }
+  if (nextVisibleIdx < CHALLENGES.length) {
+    const peek = buildCard(CHALLENGES[nextVisibleIdx], nextVisibleIdx);
     peek.classList.add("is-next");
     area.appendChild(peek);
   }
@@ -850,8 +837,6 @@ function buildCard(ch, idx) {
   card.className = "challenge-card";
   card.dataset.idx = idx;
 
-  const isLocked = ch.locked && !unlockedIds.includes(ch.id);
-
   card.innerHTML = `
     <div class="ref-image-wrap">
       <div class="ref-image-placeholder">
@@ -863,8 +848,7 @@ function buildCard(ch, idx) {
            onerror="this.style.display='none'"
            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>
       <span class="card-badge">#${String(idx + 1).padStart(2,"0")}</span>
-      ${ch.locked ? `<button class="lock-btn" onclick="openModal(${ch.id})" title="Photo secrète">${isLocked ? '🔒' : '🔓'}</button>` : ''}
-      ${isLocked ? `<div class="lock-overlay"><div class="lock-icon">🔒</div><p>Cette photo est secrète.<br>Clique sur le cadenas pour la débloquer.</p></div>` : ''}
+
       <div class="swipe-indicator left">PASSER ✕</div>
       <div class="swipe-indicator right">RETOUR ↺</div>
     </div>
@@ -989,12 +973,19 @@ function skipCard(dir = "left") {
   active.addEventListener("animationend", () => active.remove(), { once: true });
 
   currentIdx++;
+  // Sauter silencieusement les locked non débloquées
+  while (currentIdx < CHALLENGES.length && CHALLENGES[currentIdx].locked && !unlockedIds.includes(CHALLENGES[currentIdx].id)) {
+    currentIdx++;
+  }
   if (currentIdx >= CHALLENGES.length) { showDone(); return; }
   renderCard(currentIdx);
 }
 
 function nextChallenge() {
   currentIdx++;
+  while (currentIdx < CHALLENGES.length && CHALLENGES[currentIdx].locked && !unlockedIds.includes(CHALLENGES[currentIdx].id)) {
+    currentIdx++;
+  }
   if (currentIdx >= CHALLENGES.length) setTimeout(showDone, 600);
   else skipCard("left");
 }
@@ -1027,11 +1018,18 @@ function checkPassword() {
   if (input.value.trim().toUpperCase() === PASSWORD) {
     unlockedIds.push(pendingUnlockId);
     closeModal();
-    showToast("🔓 Photo débloquée !", "success");
-    // Redessiner la carte actuelle
-    const area = document.getElementById("card-area");
-    area.querySelectorAll(".challenge-card").forEach(c => c.remove());
-    renderCard(currentIdx);
+    // Masquer le cadenas une fois débloqué
+    document.getElementById("secret-lock-btn").style.display = "none";
+    // Trouver l'index du challenge secret et l'injecter après la carte actuelle
+    const secretIdx = CHALLENGES.findIndex(c => c.id === pendingUnlockId);
+    if (secretIdx !== -1) {
+      // Sauvegarder l'index actuel et aller sur la carte secrète
+      showToast("🔓 Accès secret débloqué !", "success");
+      const area = document.getElementById("card-area");
+      area.querySelectorAll(".challenge-card").forEach(c => c.remove());
+      currentIdx = secretIdx;
+      renderCard(currentIdx);
+    }
   } else {
     input.classList.remove("error");
     void input.offsetWidth;
