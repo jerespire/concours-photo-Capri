@@ -658,10 +658,11 @@
 </div>
 
 <!-- ÉCRAN FIN -->
-<div id="screen-done" style="display:none; flex-direction:column; align-items:center; justify-content:center; height:100vh; text-align:center; padding:2rem;">
+<div id="screen-done" style="display:none; flex-direction:column; align-items:center; justify-content:center; height:100vh; text-align:center; padding:2rem; gap:1rem;">
   <div class="done-icon">🏆</div>
   <h2 class="done-title">Bravo <span id="done-name"></span> !</h2>
   <p class="done-sub">Toutes tes photos ont bien été envoyées.<br>Les résultats seront annoncés bientôt !</p>
+  <button class="btn-primary" style="max-width:280px; margin-top:1rem;" onclick="goBackFromDone()">← Revenir aux défis</button>
 </div>
 
 
@@ -717,7 +718,7 @@ const CHALLENGES = [
   { id: 18, title: "Le clocher et le ciel",     description: "Cadre une tour de l'horloge ou clocher avec des fils électriques qui traversent le ciel.",   image: "images/challenge-18.jpg" },
   { id: 19, title: "Le kiosque solitaire",      description: "Photographie un petit pavillon ou kiosque en pierre au milieu d'un espace ouvert.",           image: "images/challenge-19.jpg" },
   { id: 20, title: "Le chat de Capri",          description: "Trouve un chat et photographie-le dans la même pose : ramassé sur un muret ou une surface.",  image: "images/challenge-20.jpg" },
-  { id: 21, title: "Dopamine",                   description: "Retrouve cette ambiance et recréé la scène.",                                                       image: "images/challenge-21.jpg", locked: true }
+  { id: 21, title: "Dopamine 🤑",                   description: "Retrouve cette ambiance et recréé la scène.",                                                       image: "images/challenge-21.jpg", locked: true }
 ];
 
 // ══════════════════════════════════════════
@@ -977,17 +978,47 @@ function skipCard(dir = "left") {
   while (currentIdx < CHALLENGES.length && CHALLENGES[currentIdx].locked && !unlockedIds.includes(CHALLENGES[currentIdx].id)) {
     currentIdx++;
   }
-  if (currentIdx >= CHALLENGES.length) { showDone(); return; }
+  if (currentIdx >= CHALLENGES.length) {
+    // On a parcouru toutes les cartes — vérifier si tout est envoyé
+    if (allSent()) {
+      showDone();
+    } else {
+      // Revenir au début pour les non-envoyées
+      currentIdx = getLastUnsentIdx();
+      const area2 = document.getElementById("card-area");
+      area2.querySelectorAll(".challenge-card").forEach(c => c.remove());
+      showToast("📸 Tu n'as pas encore envoyé toutes tes photos !", "error");
+      renderCard(currentIdx);
+    }
+    return;
+  }
   renderCard(currentIdx);
 }
 
 function nextChallenge() {
+  // Marquer comme envoyé
+  if (allSent()) {
+    setTimeout(showDone, 600);
+    return;
+  }
   currentIdx++;
   while (currentIdx < CHALLENGES.length && CHALLENGES[currentIdx].locked && !unlockedIds.includes(CHALLENGES[currentIdx].id)) {
     currentIdx++;
   }
-  if (currentIdx >= CHALLENGES.length) setTimeout(showDone, 600);
-  else skipCard("left");
+  if (currentIdx >= CHALLENGES.length) {
+    // Toutes les cartes vues, chercher la première non-envoyée
+    if (allSent()) {
+      setTimeout(showDone, 600);
+    } else {
+      currentIdx = getLastUnsentIdx();
+      const area = document.getElementById("card-area");
+      area.querySelectorAll(".challenge-card").forEach(c => c.remove());
+      showToast("📸 Encore quelques photos à envoyer !", "success");
+      renderCard(currentIdx);
+    }
+    return;
+  }
+  skipCard("left");
 }
 
 
@@ -1048,6 +1079,36 @@ document.getElementById("password-modal").addEventListener("click", function(e) 
 function showDone() {
   document.getElementById("screen-main").style.display = "none";
   document.getElementById("screen-done").style.display = "flex";
+}
+
+function goBackFromDone() {
+  document.getElementById("screen-done").style.display = "none";
+  const sm = document.getElementById("screen-main");
+  sm.style.display = "flex";
+  // Revenir à la dernière carte non envoyée
+  const lastSent = getLastUnsentIdx();
+  currentIdx = lastSent;
+  const area = document.getElementById("card-area");
+  area.querySelectorAll(".challenge-card").forEach(c => c.remove());
+  renderCard(currentIdx);
+}
+
+function getVisibleChallenges() {
+  return CHALLENGES.filter(c => !c.locked || unlockedIds.includes(c.id));
+}
+
+function allSent() {
+  const visible = getVisibleChallenges();
+  return visible.every(c => submissions[c.id]);
+}
+
+function getLastUnsentIdx() {
+  for (let i = 0; i < CHALLENGES.length; i++) {
+    const ch = CHALLENGES[i];
+    if (ch.locked && !unlockedIds.includes(ch.id)) continue;
+    if (!submissions[ch.id]) return i;
+  }
+  return 0;
 }
 
 // ══════════════════════════════════════════
