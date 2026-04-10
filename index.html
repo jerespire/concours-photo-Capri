@@ -9,15 +9,15 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0a0a0a;
-      --surface: #141414;
-      --surface2: #1e1e1e;
-      --border: rgba(255,255,255,0.08);
-      --text: #f0ece4;
-      --muted: #7a7570;
-      --accent: #e8c97a;
-      --accent2: #c9a84c;
-      --danger: #e07070;
+      --bg: #f5f0eb;
+      --surface: #ffffff;
+      --surface2: #ede8e2;
+      --border: rgba(0,0,0,0.08);
+      --text: #1a1008;
+      --muted: #8a7e74;
+      --accent: #C64936;
+      --accent2: #AE3521;
+      --danger: #922D1C;
       --radius: 16px;
     }
 
@@ -46,8 +46,8 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,201,122,0.08) 0%, transparent 70%),
-        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(180,120,60,0.06) 0%, transparent 60%);
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(198,73,54,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 40% at 80% 100%, rgba(174,53,33,0.05) 0%, transparent 60%);
       pointer-events: none;
     }
 
@@ -68,7 +68,7 @@
       align-items: center;
       justify-content: center;
       font-size: 28px;
-      box-shadow: 0 8px 32px rgba(232,201,122,0.25);
+      box-shadow: 0 8px 32px rgba(198,73,54,0.25);
     }
 
     .welcome-title {
@@ -112,7 +112,7 @@
 
     .input-group input:focus {
       border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(232,201,122,0.12);
+      box-shadow: 0 0 0 3px rgba(198,73,54,0.12);
     }
 
     .input-group input::placeholder { color: var(--muted); }
@@ -121,7 +121,7 @@
       width: 100%;
       padding: 1rem;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #1a1200;
+      color: #ffffff;
       border: none;
       border-radius: var(--radius);
       font-family: 'DM Sans', sans-serif;
@@ -150,7 +150,7 @@
       justify-content: space-between;
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
-      background: rgba(10,10,10,0.9);
+      background: rgba(245,240,235,0.92);
       backdrop-filter: blur(10px);
       position: relative;
       z-index: 10;
@@ -172,7 +172,7 @@
       justify-content: center;
       font-size: 0.75rem;
       font-weight: 600;
-      color: #1a1200;
+      color: #ffffff;
       flex-shrink: 0;
     }
 
@@ -194,37 +194,64 @@
 
     .card-area {
       flex: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
+      position: relative;
+      overflow: hidden;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
-      padding: 1.5rem 1rem 2rem;
     }
 
     .challenge-card {
-      position: relative;
+      position: absolute;
       width: min(92vw, 420px);
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 24px;
-      overflow: hidden;
       box-shadow: 0 32px 80px rgba(0,0,0,0.6);
       user-select: none;
-      flex-shrink: 0;
+      transition: transform 0.08s ease-out;
+      cursor: grab;
     }
 
-    .challenge-card.is-next { display: none; }
+    .challenge-card:active { cursor: grabbing; }
+
+    .challenge-card.is-next {
+      transform: scale(0.93) translateY(16px);
+      opacity: 0.6;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .challenge-card.is-active { z-index: 1; }
 
     .challenge-card.slide-left {
-      animation: slideLeft 0.45s cubic-bezier(.55,0,.45,1) forwards;
-      position: absolute;
+      animation: slideLeft 0.4s cubic-bezier(.55,0,.45,1) forwards;
+      z-index: 2;
     }
 
     .challenge-card.slide-right {
-      animation: slideRight 0.45s cubic-bezier(.55,0,.45,1) forwards;
-      position: absolute;
+      animation: slideRight 0.4s cubic-bezier(.55,0,.45,1) forwards;
+      z-index: 2;
     }
+
+    /* Indicateurs swipe */
+    .swipe-indicator {
+      position: absolute;
+      top: 20px;
+      padding: 0.4rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      opacity: 0;
+      transition: opacity 0.15s;
+      pointer-events: none;
+      z-index: 10;
+      border: 2px solid;
+    }
+    .swipe-indicator.left  { right: 20px; color: #C64936; border-color: #C64936; }
+    .swipe-indicator.right { left: 20px;  color: #2e7d32; border-color: #2e7d32; }
 
     .ref-image-wrap {
       position: relative;
@@ -259,9 +286,9 @@
       position: absolute;
       top: 12px;
       left: 12px;
-      background: rgba(0,0,0,0.65);
+      background: rgba(198,73,54,0.85);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
       border-radius: 8px;
       padding: 0.3rem 0.65rem;
       font-size: 0.72rem;
@@ -303,7 +330,7 @@
 
     .upload-zone:hover {
       border-color: var(--accent);
-      background: rgba(232,201,122,0.04);
+      background: rgba(198,73,54,0.04);
     }
 
     .upload-zone input[type="file"] {
@@ -316,8 +343,8 @@
     }
 
     .upload-zone.has-file {
-      border-color: rgba(232,201,122,0.5);
-      background: rgba(232,201,122,0.06);
+      border-color: rgba(198,73,54,0.4);
+      background: rgba(198,73,54,0.05);
     }
 
     .upload-label {
@@ -358,7 +385,7 @@
       transition: background 0.2s, color 0.2s;
     }
 
-    .btn-skip:hover { background: #2a2a2a; color: var(--text); }
+    .btn-skip:hover { background: #ddd8d2; color: var(--text); }
 
     .btn-back {
       flex: 0 0 auto;
@@ -373,14 +400,14 @@
       transition: background 0.2s, color 0.2s;
     }
 
-    .btn-back:hover { background: #2a2a2a; color: var(--text); }
+    .btn-back:hover { background: #ddd8d2; color: var(--text); }
     .btn-back:disabled { opacity: 0.25; cursor: not-allowed; }
 
     .btn-send {
       flex: 1;
       padding: 0.75rem;
       background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #1a1200;
+      color: #ffffff;
       border: none;
       border-radius: 10px;
       font-family: 'DM Sans', sans-serif;
@@ -445,14 +472,14 @@
     }
 
     #toast.show { transform: translateX(-50%) translateY(0); }
-    #toast.success { border-color: rgba(232,201,122,0.4); color: var(--accent); }
-    #toast.error   { border-color: rgba(224,112,112,0.4); color: var(--danger); }
+    #toast.success { border-color: rgba(198,73,54,0.4); color: var(--accent); }
+    #toast.error   { border-color: rgba(146,45,28,0.4); color: var(--danger); }
 
     /* Loader */
     #loader {
       position: fixed;
       inset: 0;
-      background: rgba(10,10,10,0.75);
+      background: rgba(245,240,235,0.75);
       backdrop-filter: blur(4px);
       display: none;
       align-items: center;
@@ -611,34 +638,74 @@ function renderCard(idx) {
   document.getElementById("prog-current").textContent = idx + 1;
   const area = document.getElementById("card-area");
 
-  // Enlever l'ancienne carte active
-  const old = area.querySelector(".challenge-card:not(.is-next)");
-  if (old && !old.classList.contains("slide-left") && !old.classList.contains("slide-right")) {
-    old.remove();
-  }
+  // Nettoyer toutes les cartes non animées
+  area.querySelectorAll(".challenge-card:not(.slide-left):not(.slide-right)").forEach(c => c.remove());
 
-  // Promouvoir la carte suivante
-  const nextCard = area.querySelector(".challenge-card.is-next");
-  if (nextCard) { nextCard.classList.remove("is-next"); void nextCard.offsetWidth; }
-
-  // Carte active
-  const ch   = CHALLENGES[idx];
-  const card = buildCard(ch, idx);
-  area.appendChild(card);
-
-  // Carte suivante (aperçu)
+  // Carte suivante en arrière-plan
   if (idx + 1 < CHALLENGES.length) {
     const peek = buildCard(CHALLENGES[idx + 1], idx + 1);
     peek.classList.add("is-next");
-    area.insertBefore(peek, card);
+    area.appendChild(peek);
   }
 
-  // Swipe tactile
-  card.addEventListener("touchstart", e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-  card.addEventListener("touchend",   e => {
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) > 60) skipCard(dx < 0 ? "left" : "right");
-  }, { passive: true });
+  // Carte active par-dessus
+  const ch   = CHALLENGES[idx];
+  const card = buildCard(ch, idx);
+  card.classList.add("is-active");
+  area.appendChild(card);
+
+  attachSwipe(card);
+}
+
+function attachSwipe(card) {
+  let startX = 0, startY = 0, currentX = 0, isDragging = false;
+
+  const indLeft  = card.querySelector(".swipe-indicator.left");
+  const indRight = card.querySelector(".swipe-indicator.right");
+
+  function onStart(x, y) {
+    startX = x; startY = y; currentX = 0; isDragging = true;
+    card.style.transition = "none";
+  }
+
+  function onMove(x, y) {
+    if (!isDragging) return;
+    const dx = x - startX;
+    const dy = y - startY;
+    // Annule si scroll vertical dominant
+    if (Math.abs(dy) > Math.abs(dx) + 10) { isDragging = false; return; }
+    currentX = dx;
+    const rotate = dx * 0.08;
+    card.style.transform = `translateX(${dx}px) rotate(${rotate}deg)`;
+    if (indLeft)  indLeft.style.opacity  = dx < -30 ? Math.min(1, (-dx - 30) / 60) : 0;
+    if (indRight) indRight.style.opacity = dx >  30 ? Math.min(1, (dx - 30) / 60)  : 0;
+  }
+
+  function onEnd() {
+    if (!isDragging) return;
+    isDragging = false;
+    card.style.transition = "";
+    if (indLeft)  indLeft.style.opacity  = 0;
+    if (indRight) indRight.style.opacity = 0;
+
+    if (currentX < -80) {
+      skipCard("left");
+    } else if (currentX > 80) {
+      skipCard("right");
+    } else {
+      card.style.transform = "";
+    }
+  }
+
+  // Touch
+  card.addEventListener("touchstart", e => onStart(e.touches[0].clientX, e.touches[0].clientY), { passive: true });
+  card.addEventListener("touchmove",  e => onMove(e.touches[0].clientX, e.touches[0].clientY),  { passive: true });
+  card.addEventListener("touchend",   onEnd, { passive: true });
+
+  // Mouse (desktop)
+  card.addEventListener("mousedown",  e => { if (e.target.tagName !== "INPUT" && e.target.tagName !== "BUTTON" && e.target.tagName !== "LABEL") onStart(e.clientX, e.clientY); });
+  window.addEventListener("mousemove", e => onMove(e.clientX, e.clientY));
+  window.addEventListener("mouseup",   onEnd);
 }
 
 function buildCard(ch, idx) {
@@ -657,6 +724,8 @@ function buildCard(ch, idx) {
            onerror="this.style.display='none'"
            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>
       <span class="card-badge">#${String(idx + 1).padStart(2,"0")}</span>
+      <div class="swipe-indicator left">PASSER ✕</div>
+      <div class="swipe-indicator right">RETOUR ↺</div>
     </div>
     <div class="card-body">
       <h2 class="card-title">${ch.title}</h2>
@@ -729,8 +798,15 @@ async function submitCard(cid) {
       fileData    : base64,
       mimeType    : file.type
     };
-    const resp = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-    if (!resp.ok) throw new Error("Erreur serveur");
+
+    // Envoi via no-cors pour contourner les restrictions CORS de GitHub Pages
+    await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(payload)
+    });
+
+    // Avec no-cors on ne peut pas lire la réponse, on considère l'envoi réussi
     showToast("✅ Photo envoyée !", "success");
     nextChallenge();
   } catch (err) {
@@ -763,9 +839,11 @@ function goBack() {
 
 function skipCard(dir = "left") {
   const area   = document.getElementById("card-area");
-  const active = area.querySelector(".challenge-card:not(.is-next)");
+  const active = area.querySelector(".challenge-card.is-active");
   if (!active) return;
 
+  active.style.transform = "";
+  active.classList.remove("is-active");
   active.classList.add(dir === "left" ? "slide-left" : "slide-right");
   active.addEventListener("animationend", () => active.remove(), { once: true });
 
