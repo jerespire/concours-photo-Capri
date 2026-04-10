@@ -521,6 +521,126 @@
       .ref-image-wrap { aspect-ratio: 16/9; }
       .card-body { padding: 0.9rem 1rem 1rem; }
     }
+
+    /* ── CADENAS & MODAL ── */
+    .lock-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 38px;
+      height: 38px;
+      background: rgba(198,73,54,0.9);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 2px 12px rgba(198,73,54,0.4);
+      z-index: 5;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .lock-btn:hover { transform: scale(1.1); background: rgba(174,53,33,0.95); }
+
+    .lock-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(245,240,235,0.92);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      z-index: 4;
+      border-radius: 24px;
+    }
+
+    .lock-overlay .lock-icon { font-size: 3rem; }
+    .lock-overlay p { color: var(--muted); font-size: 0.85rem; text-align: center; padding: 0 1rem; }
+
+    #password-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    #password-modal.open { display: flex; }
+
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem 1.75rem;
+      width: min(90vw, 360px);
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.2);
+      animation: fadeUp 0.3s ease both;
+    }
+
+    .modal-box .modal-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .modal-box h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      margin-bottom: 0.4rem;
+    }
+    .modal-box p { color: var(--muted); font-size: 0.85rem; margin-bottom: 1.25rem; }
+
+    .modal-input {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      text-align: center;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      outline: none;
+      margin-bottom: 0.75rem;
+      transition: border-color 0.2s;
+    }
+    .modal-input:focus { border-color: var(--accent); }
+    .modal-input.error { border-color: var(--danger); animation: shake 0.3s ease; }
+
+    .modal-actions { display: flex; gap: 0.5rem; }
+    .modal-cancel {
+      flex: 1;
+      padding: 0.75rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .modal-confirm {
+      flex: 1;
+      padding: 0.75rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25%       { transform: translateX(-6px); }
+      75%       { transform: translateX(6px); }
+    }
   </style>
 </head>
 <body>
@@ -564,6 +684,22 @@
   <p class="done-sub">Toutes tes photos ont bien été envoyées.<br>Les résultats seront annoncés bientôt !</p>
 </div>
 
+
+<!-- MODAL MOT DE PASSE -->
+<div id="password-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🔒</div>
+    <h3>Photo secrète</h3>
+    <p>Entre le mot de passe pour débloquer le dernier défi.</p>
+    <input type="text" class="modal-input" id="modal-input" placeholder="MOT DE PASSE" maxlength="20"
+           onkeydown="if(event.key==='Enter') checkPassword()"/>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Annuler</button>
+      <button class="modal-confirm" onclick="checkPassword()">Débloquer 🔓</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 <div id="loader"><div class="spinner"></div></div>
 
@@ -578,26 +714,27 @@ const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyp9dNxj8F5f0l_
 // Liste tes images de référence
 // → Crée un dossier "images/" dans GitHub et mets tes photos dedans
 const CHALLENGES = [
-  { id:  1, title: "Le portrait mystérieux",   description: "Reproduis cette mise en scène : lumière latérale, regard de côté.",          image: "images/challenge-1.jpg"  },
-  { id:  2, title: "La nature morte",           description: "Recrée cette composition avec des objets du quotidien.",                      image: "images/challenge-2.jpg"  },
-  { id:  3, title: "L'architecture",            description: "Trouve un angle similaire dans ton environnement.",                           image: "images/challenge-3.jpg"  },
-  { id:  4, title: "La silhouette",             description: "Joue avec la lumière pour créer cette silhouette.",                           image: "images/challenge-4.jpg"  },
-  { id:  5, title: "Le détail caché",           description: "Macro ou zoom : trouve ce type de détail autour de toi.",                     image: "images/challenge-5.jpg"  },
-  { id:  6, title: "Le reflet",                 description: "Capture un reflet dans une surface : eau, miroir, vitrine…",                  image: "images/challenge-6.jpg"  },
-  { id:  7, title: "La texture",                description: "Mets en valeur une texture brute : bois, béton, tissu, rouille…",             image: "images/challenge-7.jpg"  },
-  { id:  8, title: "La symétrie",               description: "Trouve une composition parfaitement symétrique autour de toi.",               image: "images/challenge-8.jpg"  },
-  { id:  9, title: "La couleur dominante",      description: "Une photo où une seule couleur écrase tout le reste.",                        image: "images/challenge-9.jpg"  },
-  { id: 10, title: "Le mouvement flou",         description: "Capte un mouvement avec un léger flou de bougé intentionnel.",                image: "images/challenge-10.jpg" },
-  { id: 11, title: "Le contre-jour",            description: "Place ton sujet devant la source de lumière pour créer un halo.",             image: "images/challenge-11.jpg" },
-  { id: 12, title: "La profondeur de champ",    description: "Sujet net, arrière-plan complètement flou (bokeh).",                          image: "images/challenge-12.jpg" },
-  { id: 13, title: "L'ombre et la lumière",     description: "Joue avec le contraste fort entre ombre et lumière directe.",                 image: "images/challenge-13.jpg" },
-  { id: 14, title: "Le minimalisme",            description: "Le moins d'éléments possible, le maximum d'impact.",                         image: "images/challenge-14.jpg" },
-  { id: 15, title: "La règle des tiers",        description: "Place ton sujet sur l'un des quatre points forts de l'image.",                image: "images/challenge-15.jpg" },
-  { id: 16, title: "Le cadre dans le cadre",    description: "Utilise un élément (porte, fenêtre, arche) pour encadrer ton sujet.",         image: "images/challenge-16.jpg" },
-  { id: 17, title: "La ligne directrice",       description: "Une ligne (route, rail, couloir) qui guide l'œil vers le fond.",              image: "images/challenge-17.jpg" },
-  { id: 18, title: "Le format carré",           description: "Compose une image pensée pour le format 1:1, sans recadrage.",               image: "images/challenge-18.jpg" },
-  { id: 19, title: "Le noir & blanc",           description: "Transforme cette scène en photo noir et blanc avec du contraste.",            image: "images/challenge-19.jpg" },
-  { id: 20, title: "La photo mystère",          description: "Surprise ! Reproduis cette image sans aucun indice supplémentaire.",          image: "images/challenge-20.jpg" }
+  { id:  1, title: "L'église blanche",          description: "Retrouve cette façade d'église ou de bâtiment religieux blanc et cadre-la de face.",         image: "images/challenge-1.jpg"  },
+  { id:  2, title: "La mer à perte de vue",     description: "Capture un panorama mer + montagne avec une végétation en premier plan.",                     image: "images/challenge-2.jpg"  },
+  { id:  3, title: "La statue solitaire",       description: "Photographie une statue ou sculpture en plein air avec le ciel comme seul fond.",             image: "images/challenge-3.jpg"  },
+  { id:  4, title: "Le port coloré",            description: "Saisis un port animé avec des bateaux et des façades colorées.",                              image: "images/challenge-4.jpg"  },
+  { id:  5, title: "La pierre et les escaliers",description: "Trouve un mur en pierre brute avec une plaque ou un panneau, et des marches.",                image: "images/challenge-5.jpg"  },
+  { id:  6, title: "La lumière dorée",          description: "Capture un bâtiment ou paysage baigné dans la lumière chaude du coucher de soleil.",          image: "images/challenge-6.jpg"  },
+  { id:  7, title: "La forêt de panneaux",      description: "Trouve un carrefour ou poteau avec plusieurs panneaux superposés dans tous les sens.",        image: "images/challenge-7.jpg"  },
+  { id:  8, title: "La rue du village",         description: "Photographie une rue typique avec voitures garées et bâtiments colorés.",                     image: "images/challenge-8.jpg"  },
+  { id:  9, title: "La chapelle de pierre",     description: "Capture une petite chapelle ou oratoire en pierre avec une croix et une icône.",              image: "images/challenge-9.jpg"  },
+  { id: 10, title: "Le point de vue vertigineux",description: "Depuis un belvédère ou sommet, photographie un panorama plongeant sur la mer et les toits.", image: "images/challenge-10.jpg" },
+  { id: 11, title: "La roche et la mer",        description: "Cadre une arche ou fenêtre naturelle dans la roche avec la mer bleue en arrière-plan.",       image: "images/challenge-11.jpg" },
+  { id: 12, title: "La ligne courbe",           description: "Trouve une route, chemin ou muret qui serpente en courbes avec la mer en fond.",              image: "images/challenge-12.jpg" },
+  { id: 13, title: "Le gardien de pierre",      description: "Photographie une sculpture ou statue de dos face à l'horizon marin.",                         image: "images/challenge-13.jpg" },
+  { id: 14, title: "Le sol mosaïque",           description: "Capture un sol en mosaïque ou pavé avec un motif décoratif.",                                 image: "images/challenge-14.jpg" },
+  { id: 15, title: "La maison sur le rocher",   description: "Photographie une villa ou bâtiment perché sur une falaise surplombant la mer.",               image: "images/challenge-15.jpg" },
+  { id: 16, title: "L'escalier monumental",     description: "Cadre un grand escalier public avec des colonnes et une vue sur la ville en fond.",           image: "images/challenge-16.jpg" },
+  { id: 17, title: "Le couvent oublié",         description: "Photographie les toits ou ruines d'un ancien couvent ou monastère avec la mer au loin.",      image: "images/challenge-17.jpg" },
+  { id: 18, title: "Le clocher et le ciel",     description: "Cadre une tour de l'horloge ou clocher avec des fils électriques qui traversent le ciel.",   image: "images/challenge-18.jpg" },
+  { id: 19, title: "Le kiosque solitaire",      description: "Photographie un petit pavillon ou kiosque en pierre au milieu d'un espace ouvert.",           image: "images/challenge-19.jpg" },
+  { id: 20, title: "Le chat de Capri",          description: "Trouve un chat et photographie-le dans la même pose : ramassé sur un muret ou une surface.",  image: "images/challenge-20.jpg" },
+  { id: 21, title: "Dopamine",                   description: "Retrouve cette ambiance et recréé la scène.",                                                       image: "images/challenge-21.jpg", locked: true }
 ];
 
 // ══════════════════════════════════════════
@@ -713,6 +850,8 @@ function buildCard(ch, idx) {
   card.className = "challenge-card";
   card.dataset.idx = idx;
 
+  const isLocked = ch.locked && !unlockedIds.includes(ch.id);
+
   card.innerHTML = `
     <div class="ref-image-wrap">
       <div class="ref-image-placeholder">
@@ -724,6 +863,8 @@ function buildCard(ch, idx) {
            onerror="this.style.display='none'"
            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"/>
       <span class="card-badge">#${String(idx + 1).padStart(2,"0")}</span>
+      ${ch.locked ? `<button class="lock-btn" onclick="openModal(${ch.id})" title="Photo secrète">${isLocked ? '🔒' : '🔓'}</button>` : ''}
+      ${isLocked ? `<div class="lock-overlay"><div class="lock-icon">🔒</div><p>Cette photo est secrète.<br>Clique sur le cadenas pour la débloquer.</p></div>` : ''}
       <div class="swipe-indicator left">PASSER ✕</div>
       <div class="swipe-indicator right">RETOUR ↺</div>
     </div>
@@ -857,6 +998,54 @@ function nextChallenge() {
   if (currentIdx >= CHALLENGES.length) setTimeout(showDone, 600);
   else skipCard("left");
 }
+
+
+// ══════════════════════════════════════════
+//  SYSTÈME CADENAS
+// ══════════════════════════════════════════
+const PASSWORD = "GAMBLING";
+let unlockedIds = [];
+let pendingUnlockId = null;
+
+function openModal(challengeId) {
+  pendingUnlockId = challengeId;
+  const modal = document.getElementById("password-modal");
+  const input = document.getElementById("modal-input");
+  input.value = "";
+  input.classList.remove("error");
+  modal.classList.add("open");
+  setTimeout(() => input.focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById("password-modal").classList.remove("open");
+  pendingUnlockId = null;
+}
+
+function checkPassword() {
+  const input = document.getElementById("modal-input");
+  if (input.value.trim().toUpperCase() === PASSWORD) {
+    unlockedIds.push(pendingUnlockId);
+    closeModal();
+    showToast("🔓 Photo débloquée !", "success");
+    // Redessiner la carte actuelle
+    const area = document.getElementById("card-area");
+    area.querySelectorAll(".challenge-card").forEach(c => c.remove());
+    renderCard(currentIdx);
+  } else {
+    input.classList.remove("error");
+    void input.offsetWidth;
+    input.classList.add("error");
+    input.value = "";
+    input.placeholder = "Mauvais mot de passe…";
+    setTimeout(() => { input.placeholder = "MOT DE PASSE"; }, 2000);
+  }
+}
+
+// Fermer modal en cliquant dehors
+document.getElementById("password-modal").addEventListener("click", function(e) {
+  if (e.target === this) closeModal();
+});
 
 function showDone() {
   document.getElementById("screen-main").style.display = "none";
