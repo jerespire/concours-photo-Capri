@@ -920,9 +920,9 @@ async function submitCard(cid) {
     const payload = {
       participant : userName,
       challengeId : cid,
-      fileName    : `${userName}_challenge${cid}_${Date.now()}.${file.name.split('.').pop()}`,
+      fileName    : `${userName}_challenge${cid}_${Date.now()}.jpg`,
       fileData    : base64,
-      mimeType    : file.type
+      mimeType    : "image/jpeg"
     };
 
     // Envoi via no-cors pour contourner les restrictions CORS de GitHub Pages
@@ -945,10 +945,33 @@ async function submitCard(cid) {
 
 function fileToBase64(file) {
   return new Promise((res, rej) => {
-    const r = new FileReader();
-    r.onload  = () => res(r.result.split(",")[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
+    const MAX_SIZE = 1200; // px max width/height
+    const QUALITY  = 0.75; // qualité JPEG
+
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+
+      // Calculer les nouvelles dimensions
+      let w = img.width, h = img.height;
+      if (w > MAX_SIZE || h > MAX_SIZE) {
+        if (w > h) { h = Math.round(h * MAX_SIZE / w); w = MAX_SIZE; }
+        else        { w = Math.round(w * MAX_SIZE / h); h = MAX_SIZE; }
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width  = w;
+      canvas.height = h;
+      canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+
+      const dataUrl = canvas.toDataURL("image/jpeg", QUALITY);
+      res(dataUrl.split(",")[1]);
+    };
+
+    img.onerror = rej;
+    img.src = url;
   });
 }
 
