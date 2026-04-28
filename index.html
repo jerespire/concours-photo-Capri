@@ -718,7 +718,7 @@ const CHALLENGES = [
   { id: 18, title: "Le clocher et le ciel",     description: "Cadre une tour de l'horloge ou clocher avec des fils électriques qui traversent le ciel.",   image: "images/challenge-18.jpg" },
   { id: 19, title: "Le kiosque solitaire",      description: "Photographie un petit pavillon ou kiosque en pierre au milieu d'un espace ouvert.",           image: "images/challenge-19.jpg" },
   { id: 20, title: "Le chat de Capri",          description: "Trouve un chat et photographie-le dans la même pose : ramassé sur un muret ou une surface.",  image: "images/challenge-20.jpg" },
-  { id: 21, title: "Dopamine 🤑",                   description: "Retrouve cette ambiance et recréé la scène.",                                                       image: "images/challenge-21.jpg", locked: true }
+  { id: 21, title: "Dopamine",                   description: "Retrouve cette ambiance et recréé la scène.",                                                       image: "images/challenge-21.jpg", locked: true }
 ];
 
 // ══════════════════════════════════════════
@@ -857,7 +857,7 @@ function buildCard(ch, idx) {
       <h2 class="card-title">${ch.title}</h2>
       <p class="card-desc">${ch.description}</p>
       <label class="upload-zone" id="zone-${ch.id}">
-        <input type="file" accept="image/*" capture="environment"
+        <input type="file" accept="image/*"
                onchange="handleFile(event, ${ch.id})"/>
         <img class="preview-thumb" id="thumb-${ch.id}" alt=""/>
         <div class="upload-label" id="lbl-${ch.id}">
